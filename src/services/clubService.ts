@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Club, CreateClubRequest, UpdateClubRequest } from '../models/Club';
+import { Club, CreateClubRequest, UpdateClubRequest } from '@/models/Club';
+import { db } from '../index';
 
 // In-memory storage for clubs
 export const clubs: Map<string, Club> = new Map();
 
 // Club CRUD operations
 export const clubService = {
-  create: (data: CreateClubRequest): Club => {
+  create: async (data: CreateClubRequest): Promise<Club> => {
     const club: Club = {
       id: uuidv4(),
       name: data.name,
@@ -16,19 +17,30 @@ export const clubService = {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    await db.query('INSERT INTO clubs (id, name, description, owner_id, member_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)', [
+      club.id,
+      club.name,
+      club.description,
+      club.ownerId,
+      club.memberIds,
+      club.createdAt,
+      club.updatedAt,
+    ]);
     clubs.set(club.id, club);
     return club;
   },
 
-  getAll: (): Club[] => {
-    return Array.from(clubs.values());
+  getAll: async (): Promise<Club[]> => {
+    const result = await db.query<Club>('SELECT * FROM clubs');
+    return result.rows;
   },
 
-  getById: (id: string): Club | undefined => {
-    return clubs.get(id);
+  getById: async (id: string): Promise<Club | undefined> => {
+    const result = await db.query<Club>('SELECT * FROM clubs WHERE id = $1', [id]);
+    return result.rows[0];
   },
 
-  update: (id: string, data: UpdateClubRequest): Club | undefined => {
+  update: async (id: string, data: UpdateClubRequest): Promise<Club | undefined> => {
     const club = clubs.get(id);
     if (!club) return undefined;
 
@@ -37,15 +49,24 @@ export const clubService = {
       ...data,
       updatedAt: new Date(),
     };
+    await db.query('UPDATE clubs SET name = $2, description = $3, owner_id = $4, member_ids = $5, updated_at = $6 WHERE id = $1', [
+      id,
+      updatedClub.name,
+      updatedClub.description,
+      updatedClub.ownerId,
+      updatedClub.memberIds,
+      updatedClub.updatedAt,
+    ]);
     clubs.set(id, updatedClub);
     return updatedClub;
   },
 
-  delete: (id: string): boolean => {
-    return clubs.delete(id);
+  delete: async (id: string): Promise<boolean> => {
+    await db.query('DELETE FROM clubs WHERE id = $1', [id]);
+    return true;
   },
 
-  addMember: (clubId: string, userId: string): Club | undefined => {
+  addMember: async (clubId: string, userId: string): Promise<Club | undefined> => {
     const club = clubs.get(clubId);
     if (!club) return undefined;
 
@@ -57,7 +78,7 @@ export const clubService = {
     return club;
   },
 
-  removeMember: (clubId: string, userId: string): Club | undefined => {
+  removeMember: async (clubId: string, userId: string): Promise<Club | undefined> => {
     const club = clubs.get(clubId);
     if (!club) return undefined;
 

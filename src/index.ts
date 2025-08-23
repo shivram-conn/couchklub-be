@@ -1,11 +1,11 @@
 import { join } from 'path';
 import { FileSystemRouter } from "bun";
-
+import { initializeDatabase } from "./utils/initDatabase";
     const router = new FileSystemRouter({
         dir: import.meta.dir + "/routes", // Path to your pages directory
         style: "nextjs",
     });
-
+export const db = await initializeDatabase();
 const server = Bun.serve({
   port: 3000,
   async fetch(req) {

@@ -3,7 +3,7 @@ import { CreateUserRequest } from '../../models/User';
 
 // GET /users - Get all users
 export const GET = async (req: Request, corsHeaders: Record<string, string>) => {
-  const users = userService.getAll();
+  const users = await userService.getAll();
   return new Response(JSON.stringify(users), {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
@@ -18,7 +18,7 @@ export const POST = async (req: Request, corsHeaders: Record<string, string>) =>
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  const user = userService.create(body);
+  const user = await userService.create(body);
   return new Response(JSON.stringify(user), {
     status: 201,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },

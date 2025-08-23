@@ -1,6 +1,37 @@
 # CouchKlub Backend
 
-A Bun HTTP server with CRUD operations for managing users, clubs, and games.
+A modern Bun HTTP server with file-system based routing for managing users, clubs, and games in a gaming platform.
+
+## Architecture
+
+This project uses a clean, modular architecture:
+
+- **File-system based routing** - Routes are automatically generated from the `src/routes/` directory structure
+- **Service layer** - Business logic separated into dedicated service files
+- **Type-safe models** - TypeScript interfaces for all data structures
+- **In-memory storage** - Fast data access using Maps for development
+
+## Project Structure
+
+```
+src/
+├── index.ts              # Main server with FileSystemRouter
+├── models/               # TypeScript interfaces
+│   ├── User.ts
+│   ├── Club.ts
+│   └── Game.ts
+├── services/             # Business logic layer
+│   ├── userService.ts
+│   ├── clubService.ts
+│   └── gameService.ts
+├── routes/               # File-system based API routes
+│   ├── health-check/
+│   ├── users/
+│   ├── clubs/
+│   └── games/
+└── utils/
+    └── fileSystemRouter.ts
+```
 
 ## Setup
 
@@ -142,9 +173,24 @@ curl -X PUT http://localhost:3000/games/game-id-here \
 
 ## Features
 
-- **In-memory storage** - Data persists during server runtime
+- **File-system based routing** - Automatic route generation from folder structure
+- **Modular architecture** - Separated concerns with services and models
+- **In-memory storage** - Fast data access using Maps
 - **CORS enabled** - Ready for frontend integration
 - **Input validation** - Basic validation for required fields
 - **Error handling** - Proper HTTP status codes and error messages
-- **TypeScript** - Full type safety
+- **TypeScript** - Full type safety throughout the application
 - **Relationship validation** - Checks for valid user/club references
+
+## Development
+
+The project follows Next.js-style file-system routing conventions:
+- `index.ts` files handle the base route
+- `[id].ts` files handle dynamic parameters
+- Nested folders create nested routes
+- Each route file exports HTTP method handlers (GET, POST, PUT, DELETE)
+
+Route handlers receive:
+- `req: Request` - The incoming request
+- `corsHeaders: Record<string, string>` - CORS headers to include in response
+- `query: Record<string, string>` - Query parameters (for dynamic routes)
