@@ -1,0 +1,21 @@
+{
+  "name": "couchklub-be",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/uuid": "^10",
+    "eslint": "^9",
+    "@eslint/eslintrc": "^3"
+  }
+}
