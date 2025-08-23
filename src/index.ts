@@ -1,6 +1,10 @@
-import { handleUserRoutes } from './routes/userRoutes';
-import { handleClubRoutes } from './routes/clubRoutes';
-import { handleGameRoutes } from './routes/gameRoutes';
+import { join } from 'path';
+import { FileSystemRouter } from "bun";
+
+    const router = new FileSystemRouter({
+        dir: import.meta.dir + "/routes", // Path to your pages directory
+        style: "nextjs",
+    });
 
 const server = Bun.serve({
   port: 3000,
@@ -29,22 +33,15 @@ const server = Bun.serve({
         });
       }
 
-      // Try user routes
-      if (pathname.startsWith('/users')) {
-        const response = await handleUserRoutes(req, pathname, method, corsHeaders);
-        if (response) return response;
-      }
-
-      // Try club routes
-      if (pathname.startsWith('/clubs')) {
-        const response = await handleClubRoutes(req, pathname, method, corsHeaders);
-        if (response) return response;
-      }
-
-      // Try game routes
-      if (pathname.startsWith('/games')) {
-        const response = await handleGameRoutes(req, pathname, method, corsHeaders);
-        if (response) return response;
+      // Try file-system based routing
+      let match = router.match(req);
+      if (match) {
+        console.log(match);
+        const module = await import(match.filePath);
+        if (Object.keys(module).includes(method)) {
+          const handler = module[method];
+          return handler(req, corsHeaders, match.query);
+        }
       }
 
       // 404 for unmatched routes
