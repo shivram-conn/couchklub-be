@@ -1,6 +1,7 @@
 import { clubService } from '../../services/clubService';
 import { UpdateClubRequest } from '../../models/Club';
 
+export const authRequired = false;
 // GET /clubs/:id - Get club by ID
 export const GET = async (req: Request, corsHeaders: Record<string, string>, params: { id: string }) => {
   const club = clubService.getById(params.id);

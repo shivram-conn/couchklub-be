@@ -1,6 +1,8 @@
 import { userService } from '../../services/userService';
 import { CreateUserRequest } from '../../models/User';
 
+export const authRequired = false;
+
 // GET /users - Get all users
 export const GET = async (req: Request, corsHeaders: Record<string, string>) => {
   const users = await userService.getAll();

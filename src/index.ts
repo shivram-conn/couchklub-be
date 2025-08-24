@@ -1,11 +1,16 @@
 import { join } from 'path';
 import { FileSystemRouter } from "bun";
-import { initializeDatabase } from "./utils/initDatabase";
-    const router = new FileSystemRouter({
+import { initializeDatabase } from "@/utils/initDatabase";
+import { verifyToken } from "@/utils/verifyToken";
+import { addButterJam } from "./utils/bunButterJam";
+
+const router = new FileSystemRouter({
         dir: import.meta.dir + "/routes", // Path to your pages directory
         style: "nextjs",
     });
+
 export const db = await initializeDatabase();
+
 const server = Bun.serve({
   port: 3000,
   async fetch(req) {
@@ -26,29 +31,9 @@ const server = Bun.serve({
     }
 
     try {
-      // Health check
-      if (pathname === '/health' && method === 'GET') {
-        return new Response(JSON.stringify({ status: 'OK', timestamp: new Date().toISOString() }), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
 
-      // Try file-system based routing
-      let match = router.match(req);
-      if (match) {
-        console.log(match);
-        const module = await import(match.filePath);
-        if (Object.keys(module).includes(method)) {
-          const handler = module[method];
-          return handler(req, corsHeaders, match.query);
-        }
-      }
-
-      // 404 for unmatched routes
-      return new Response(JSON.stringify({ error: 'Route not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+      // Try file-system based routing along with authentication
+      return await addButterJam(req, router, corsHeaders);
 
     } catch (error) {
       console.error('Server error:', error);
