@@ -12,6 +12,7 @@ export const userService = {
       id: uuidv4(),
       name: data.name,
       email: data.email,
+      password: data.password,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -61,5 +62,12 @@ export const userService = {
     await db.query('DELETE FROM users WHERE id = $1', [id]);
     users.delete(id);
     return true;
+  },
+  getByEmail: async (email: string): Promise<User | undefined> => {
+    const result = await db.query<User>('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return undefined;
+    }
+    return result.rows[0];
   },
 };

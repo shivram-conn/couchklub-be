@@ -1,10 +1,10 @@
 import { clubService } from '../../services/clubService';
 import { userService } from '../../services/userService';
 import { CreateClubRequest } from '../../models/Club';
-
+import { TokenPayload } from '../../utils/verifyToken';
 // GET /clubs - Get all clubs
 export const GET = async (req: Request, corsHeaders: Record<string, string>) => {
-  const clubs = clubService.getAll();
+  const clubs = clubService.getClubs((JSON.parse(req.headers.get('currentUserInfo') as string) as TokenPayload).id);
   return new Response(JSON.stringify(clubs), {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
@@ -13,7 +13,8 @@ export const GET = async (req: Request, corsHeaders: Record<string, string>) => 
 // POST /clubs - Create new club
 export const POST = async (req: Request, corsHeaders: Record<string, string>) => {
   const body = await req.json() as CreateClubRequest;
-  if (!body.name || !body.description || !body.ownerId) {
+  body.ownerId = (JSON.parse(req.headers.get('currentUserInfo') as string) as TokenPayload).id;
+  if (!body.name || !body.description || !body.memberIds) {
     return new Response(JSON.stringify({ error: 'Name, description, and ownerId are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },

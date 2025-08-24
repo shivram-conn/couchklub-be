@@ -8,16 +8,17 @@ export const clubs: Map<string, Club> = new Map();
 // Club CRUD operations
 export const clubService = {
   create: async (data: CreateClubRequest): Promise<Club> => {
+    data.memberIds.push(data.ownerId);
     const club: Club = {
       id: uuidv4(),
       name: data.name,
       description: data.description,
       ownerId: data.ownerId,
-      memberIds: [data.ownerId], // Owner is automatically a member
+      memberIds: data.memberIds, // Owner is automatically a member
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    await db.query('INSERT INTO clubs (id, name, description, owner_id, member_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)', [
+    const result = await db.query('INSERT INTO clubs (id, name, description, owner_id, member_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)', [
       club.id,
       club.name,
       club.description,
@@ -26,12 +27,19 @@ export const clubService = {
       club.createdAt,
       club.updatedAt,
     ]);
-    clubs.set(club.id, club);
+    if (result.rowCount === 0) {
+      throw new Error('Failed to create club');
+    }
     return club;
   },
 
   getAll: async (): Promise<Club[]> => {
     const result = await db.query<Club>('SELECT * FROM clubs');
+    return result.rows;
+  },
+
+  getClubs : async (memberId: string): Promise<Club[]> => {
+    const result = await db.query<Club>('SELECT * FROM clubs WHERE member_ids @> $1', [memberId]);
     return result.rows;
   },
 

@@ -11,6 +11,7 @@ export interface Club {
 export interface CreateClubRequest {
   name: string;
   description: string;
+  memberIds: string[];
   ownerId: string;
 }
 
