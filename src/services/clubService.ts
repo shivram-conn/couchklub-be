@@ -8,7 +8,9 @@ export const clubs: Map<string, Club> = new Map();
 // Club CRUD operations
 export const clubService = {
   create: async (data: CreateClubRequest): Promise<Club> => {
-    data.memberIds.push(data.ownerId);
+    
+    if (data.memberIds.length > 0) (data.memberIds as string[]).push(data.ownerId);
+    else data.memberIds = [data.ownerId];
     const club: Club = {
       id: uuidv4(),
       name: data.name,
@@ -39,7 +41,8 @@ export const clubService = {
   },
 
   getClubs : async (memberId: string): Promise<Club[]> => {
-    const result = await db.query<Club>('SELECT * FROM clubs WHERE member_ids @> $1', [memberId]);
+    const result = await db.query<Club>('SELECT * FROM clubs WHERE member_ids @> ARRAY[$1]', [memberId]);
+    console.log("result.rows: " + result.rows);
     return result.rows;
   },
 

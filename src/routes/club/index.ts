@@ -4,8 +4,9 @@ import { CreateClubRequest } from '../../models/Club';
 import { TokenPayload } from '../../utils/verifyToken';
 // GET /clubs - Get all clubs
 export const GET = async (req: Request, corsHeaders: Record<string, string>) => {
-  const clubs = clubService.getClubs((JSON.parse(req.headers.get('currentUserInfo') as string) as TokenPayload).id);
+  const clubs = await clubService.getClubs((JSON.parse(req.headers.get('currentUserInfo') as string) as TokenPayload).id);
   return new Response(JSON.stringify(clubs), {
+    status: 200,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 };
@@ -28,7 +29,7 @@ export const POST = async (req: Request, corsHeaders: Record<string, string>) =>
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  const club = clubService.create(body);
+  const club = await clubService.create(body);
   return new Response(JSON.stringify(club), {
     status: 201,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
