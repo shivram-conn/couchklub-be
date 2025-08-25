@@ -3,6 +3,9 @@ import { FileSystemRouter } from "bun";
 import { initializeDatabase } from "@/utils/initDatabase";
 import { verifyToken } from "@/utils/verifyToken";
 import { addButterJam } from "./utils/bunButterJam";
+import { initApp } from "@/utils/initApp";
+
+initApp();
 
 const router = new FileSystemRouter({
         dir: import.meta.dir + "/routes", // Path to your pages directory
@@ -44,6 +47,7 @@ const server = Bun.serve({
     }
   },
 });
+
 
 console.log(`🚀 Server running at http://localhost:${server.port}`);
 console.log('Available endpoints:');
