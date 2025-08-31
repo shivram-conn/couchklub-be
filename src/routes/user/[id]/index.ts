@@ -1,45 +1,57 @@
-import { userService } from '../../../services/userService';
-import { UpdateUserRequest } from '../../../models/User';
+import { UserUsecases } from '../../../usecases/user';
 
 // GET /users/:id - Get user by ID
 export const GET = async (req: Request, corsHeaders: Record<string, string>, params: { id: string }) => {
-  const user = userService.getById(params.id);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), {
-      status: 404,
+  const { id } = params;
+  const result = await UserUsecases.getUserById(id);
+  
+  if (result.success) {
+    return new Response(JSON.stringify(result.data), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  return new Response(JSON.stringify(user), {
+  
+  const statusCode = result.statusCode || 500;
+  return new Response(JSON.stringify(result.error), {
+    status: statusCode,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 };
 
 // PUT /users/:id - Update user
 export const PUT = async (req: Request, corsHeaders: Record<string, string>, params: { id: string }) => {
-  const body = await req.json() as UpdateUserRequest;
-  const user = userService.update(params.id, body);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), {
-      status: 404,
+  const body = await req.json();
+  const result = await UserUsecases.updateUser(params.id, body);
+  
+  if (result.success) {
+    return new Response(JSON.stringify(result.data), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  return new Response(JSON.stringify(user), {
+  
+  const statusCode = result.statusCode || 400;
+  return new Response(JSON.stringify(result.error), {
+    status: statusCode,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 };
 
 // DELETE /users/:id - Delete user
 export const DELETE = async (req: Request, corsHeaders: Record<string, string>, params: { id: string }) => {
-  const deleted = userService.delete(params.id);
-  if (!deleted) {
-    return new Response(JSON.stringify({ error: 'User not found' }), {
-      status: 404,
+  const result = await UserUsecases.deleteUser(params.id);
+  
+  if (result.success) {
+    return new Response(JSON.stringify(result.data), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
+  
+  const statusCode = result.statusCode || 500;
+  return new Response(JSON.stringify(result.error), {
+    status: statusCode,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 };

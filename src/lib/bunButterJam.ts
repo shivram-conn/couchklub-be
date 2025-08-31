@@ -2,12 +2,23 @@ import { FileSystemRouter } from "bun";
 import { verifyToken } from "./verifyToken";
 import { TokenPayload } from "./verifyToken";
 
+// Type definition for FileSystemRouter match result
+interface RouterMatch {
+  filePath: string;
+  kind: "exact" | "catch-all" | "optional-catch-all" | "dynamic";
+  name: string;
+  pathname: string;
+  src: string;
+  params?: Record<string, string>;
+  query?: Record<string, string>;
+}
+
 /**
  * Handle routing logic with authentication and method validation
  */
 export let currentUserInfo: TokenPayload | undefined = undefined;
 export async function addButterJam(req: Request, router: FileSystemRouter, corsHeaders: Record<string, string>): Promise<Response> {
-  let match = router.match(req);
+  let match = router.match(req) as RouterMatch | null;
   if (match) {
     console.log(match);
     const module = await import(match.filePath);
@@ -75,6 +86,10 @@ export async function addButterJam(req: Request, router: FileSystemRouter, corsH
             }
         }
     }
+    //we can prefix $ to any function to make it unauthenticated
+    else if (Object.keys(module).includes('$'+req.method)) {
+        return module['$'+req.method](req, corsHeaders, match.query);
+    }
 
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
@@ -96,4 +111,3 @@ export function getCurrentUserInfo(req: Request): TokenPayload | undefined {
   }
   return JSON.parse(userInfo);
 }
-

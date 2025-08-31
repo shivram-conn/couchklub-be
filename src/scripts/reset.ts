@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { resetDatabase } from '../utils/initDatabase';
+import { resetDatabase } from '@/lib/initDatabase';
 
 async function runReset() {
   try {

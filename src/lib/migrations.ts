@@ -1,4 +1,4 @@
-import Database from './database';
+import Database from '@/lib/database';
 
 export class DatabaseMigrations {
   private db: Database;

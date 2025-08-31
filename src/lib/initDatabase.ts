@@ -1,5 +1,5 @@
-import Database, { getDatabaseConfigFromEnv } from './database';
-import { DatabaseMigrations } from './migrations';
+import Database, { getDatabaseConfigFromEnv } from '@/lib/database';
+import { DatabaseMigrations } from '@/lib/migrations';
 
 export async function initializeDatabase(): Promise<Database> {
   try {

@@ -1,9 +1,7 @@
-import { join } from 'path';
 import { FileSystemRouter } from "bun";
-import { initializeDatabase } from "@/utils/initDatabase";
-import { verifyToken } from "@/utils/verifyToken";
-import { addButterJam } from "./utils/bunButterJam";
-import { initApp } from "@/utils/initApp";
+import { initializeDatabase } from "@/lib/initDatabase";
+import { addButterJam } from "@/lib/bunButterJam";
+import { initApp } from "@/lib/initApp";
 
 initApp();
 

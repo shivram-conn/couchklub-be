@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { initializeDatabase } from '../utils/initDatabase';
+import { initializeDatabase } from '@/lib/initDatabase';
 
 async function runMigrations() {
   try {
