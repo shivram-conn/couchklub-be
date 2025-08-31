@@ -3,18 +3,8 @@ import { openApiSpec } from '@/lib/documentation';
 export const $GET = async (req: Request, corsHeaders: Record<string, string>) => {
   const url = new URL(req.url);
   
-  // Serve the OpenAPI spec as JSON
-  if (url.pathname === '/docs/openapi.json') {
-    return new Response(JSON.stringify(openApiSpec, null, 2), {
-      status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        ...corsHeaders 
-      },
-    });
-  }
-  
-  // Serve Scalar documentation UI
+  // Serve Scalar documentation UI with embedded spec
+  //JSON.stringify(openApiSpec).replace(/"/g, '&quot;');
   const html = `
 <!DOCTYPE html>
 <html>
@@ -26,7 +16,7 @@ export const $GET = async (req: Request, corsHeaders: Record<string, string>) =>
 <body>
   <script
     id="api-reference"
-    data-content='${JSON.stringify(openApiSpec)}'
+    data-url="/docs/openapi.json"
     data-configuration='{"theme":"purple"}'></script>
   <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
 </body>
