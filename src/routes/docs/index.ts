@@ -3,8 +3,6 @@ import { openApiSpec } from '@/lib/documentation';
 export const $GET = async (req: Request, corsHeaders: Record<string, string>) => {
   const url = new URL(req.url);
   
-  // Serve Scalar documentation UI with embedded spec
-  //JSON.stringify(openApiSpec).replace(/"/g, '&quot;');
   const html = `
 <!DOCTYPE html>
 <html>
